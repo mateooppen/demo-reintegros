@@ -3251,12 +3251,32 @@ nobis-card .text p {
 </style>
 <style>
   /* ----- Controles de la demo: no forman parte de la pantalla real ----- */
-  .demo-bar { background: #2b2d33; color: #e9e9ea; padding: 12px 16px; font: 13px/1.4 system-ui, sans-serif; }
-  .demo-bar .in { max-width: 1120px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; }
-  .demo-bar b { color: #fff; }
-  .demo-bar label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
-  .demo-bar select { font: inherit; padding: 3px 6px; border-radius: 4px; border: 0; }
-  .demo-bar button { font: inherit; margin-left: auto; padding: 4px 12px; border-radius: 14px; border: 1px solid #77797f; background: none; color: #fff; cursor: pointer; }
+  .demo-bar { background: #1f2227; color: #c9ccd3; padding: 10px 20px; font: 500 13px/1.3 system-ui, -apple-system, "Segoe UI", sans-serif; border-bottom: 1px solid #000; }
+  .demo-bar .in { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; gap: 10px 14px; }
+  .demo-bar .tag { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-weight: 600; white-space: nowrap; }
+  .demo-bar .tag i { font-style: normal; font-size: 10px; letter-spacing: .08em; padding: 3px 7px; border-radius: 4px; background: #13a538; color: #fff; }
+  .demo-bar .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: 10px; }
+  .demo-bar .sw, .demo-bar .seg { display: inline-flex; align-items: center; height: 32px; border-radius: 16px; background: #2c3037; border: 1px solid #3a3f48; white-space: nowrap; }
+  .demo-bar .sw { gap: 8px; padding: 0 12px 0 8px; cursor: pointer; user-select: none; }
+  .demo-bar .sw input, .demo-bar .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .demo-bar .sw .tr { width: 28px; height: 16px; border-radius: 8px; background: #555b66; position: relative; transition: background .15s; flex: none; }
+  .demo-bar .sw .tr::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; transition: transform .15s; }
+  .demo-bar .sw input:checked + .tr { background: #13a538; }
+  .demo-bar .sw input:checked + .tr::after { transform: translateX(12px); }
+  .demo-bar .sw:has(input:checked) { color: #fff; border-color: #13a538; }
+  .demo-bar .seg { padding: 0 3px 0 12px; gap: 8px; }
+  .demo-bar .seg .opts { display: inline-flex; gap: 2px; }
+  .demo-bar .seg label { cursor: pointer; }
+  .demo-bar .seg label span { display: block; padding: 4px 10px; border-radius: 12px; }
+  .demo-bar .seg input:checked + span { background: #fff; color: #1f2227; }
+  .demo-bar :is(.sw, .seg label):has(input:focus-visible) { outline: 2px solid #8fdca3; outline-offset: 2px; }
+  .demo-bar button { font: inherit; margin-left: auto; height: 32px; padding: 0 14px; border-radius: 16px; border: 1px solid #5b616c; background: none; color: #fff; cursor: pointer; white-space: nowrap; flex: none; }
+  .demo-bar button:hover { background: #2c3037; }
+  @media (max-width: 900px) {
+    .demo-bar { padding: 10px 16px; }
+    .demo-bar .in { flex-wrap: wrap; }
+    .demo-bar .ctrls { order: 3; flex-basis: 100%; margin-left: 0; }
+  }
   html, body { height: auto; }
   mat-form-field { position: relative; } /* ancla del panel del select (en la app va en un overlay) */
   .demo-overlay { position: fixed; z-index: 1000; } /* como el overlay de la app: no lo recorta el stepper */
@@ -3404,16 +3424,18 @@ nobis-card .text p {
 
 <div class="demo-bar">
   <div class="in">
-    <b>Controles de la demo</b>
-    <label><input type="checkbox" data-cfg="debt"> Cuenta con deuda</label>
-    <label><input type="checkbox" data-cfg="planN"> Plan N (celiaquía trimestral)</label>
-    <label>Comprobante detectado
-      <select data-cfg="receipt"><option value="invoice">Factura</option><option value="transfer">Transferencia</option></select>
-    </label>
-    <label>Declaración de celiaquía
-      <select data-cfg="declaration"><option value="foot">Al pie del último paso</option><option value="step">Como paso extra</option></select>
-    </label>
-    <button data-act="reset">Reiniciar</button>
+    <span class="tag"><i>DEMO</i> Simular</span>
+    <div class="ctrls">
+      <label class="sw"><input type="checkbox" data-cfg="debt"><span class="tr"></span>Cuenta con deuda</label>
+      <label class="sw"><input type="checkbox" data-cfg="planN"><span class="tr"></span>Plan N (celiaquía trimestral)</label>
+      <div class="seg" role="radiogroup" aria-label="Comprobante detectado">Comprobante
+        <span class="opts">
+          <label><input type="radio" name="cfg-receipt" data-cfg="receipt" value="invoice" checked><span>Factura</span></label>
+          <label><input type="radio" name="cfg-receipt" data-cfg="receipt" value="transfer"><span>Transferencia</span></label>
+        </span>
+      </div>
+    </div>
+    <button data-act="reset">↺ Reiniciar</button>
   </div>
 </div>
 
@@ -3471,7 +3493,7 @@ const ORDERS = {
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 // ---------- Estado ----------
-const CFG = { debt: false, planN: false, receipt: 'invoice', declaration: 'foot' };
+const CFG = { debt: false, planN: false, receipt: 'invoice' };
 let S;
 function reset() {
   S = { step: 0, max: 0, open: '', type: '', kind: '', member: 0, order: null, files: {}, scanning: false, scanned: false, f: { practice: '' } };
@@ -3488,12 +3510,11 @@ const members = () => (isCeliac() ? FAMILY.filter((m) => m.cel.enabled) : FAMILY
 const orders = () => ORDERS[S.member] ?? [];
 const digits = (v, n) => new RegExp(`^\\d{${n}}$`).test(v ?? '');
 
-/** Los pasos dependen del tipo: cobro de plus suma el de práctica; celiaquía puede sumar la declaración. */
+/** Los pasos dependen del tipo: cobro de plus suma el de práctica. */
 function steps() {
   const list = ['type', 'member'];
   if (isPlus()) list.push('order');
   list.push('docs');
-  if (isCeliac() && CFG.declaration === 'step') list.push('decl');
   return list;
 }
 
@@ -3754,7 +3775,7 @@ function docsBody() {
           ${field('Fecha ticket', 'celDate', { small: true, locked: true, hint: 'DD/MM/AAAA.' })}` : ''}`}
       ${CFG.planN || S.scanned ? `
         ${bankFields()}
-        ${CFG.declaration === 'foot' ? declaration() : ''}` : ''}`;
+        ${declaration()}` : ''}`;
   }
 
   const o = S.order;
@@ -3794,7 +3815,7 @@ function render() {
   const list = steps();
   if (S.step >= list.length) S.step = list.length - 1;
   S.max = Math.max(S.max, S.step);
-  const bodies = { type: typeBody, member: memberBody, order: orderBody, docs: docsBody, decl: declaration };
+  const bodies = { type: typeBody, member: memberBody, order: orderBody, docs: docsBody };
   const submitLabel = isCeliac() ? 'SOLICITAR REINTEGRO' : 'CARGAR SOLICITUD';
 
   document.getElementById('formality').outerHTML = `<div id="formality" style="display:contents">${select('', 'Tipo de trámite', [{ id: 1, name: 'Solicitud de reintegro' }], 1)}</div>`;
